@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../firebase"; 
 import Navbar from "@/app/components/Navbar";
 
 const ProductForm = () => {
@@ -75,7 +76,7 @@ const ProductForm = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (
@@ -87,38 +88,31 @@ const ProductForm = () => {
             sellerName !== "" &&
             contactDetails !== ""
         ) {
-            const product = {
-                id,
+            const newProduct = {
                 productName,
                 description,
                 price,
-                image, 
+                image,
                 quantity: 1,
                 category,
                 sellerName,
                 contactDetails,
             };
 
-             fetch('https://market-psi-sage.vercel.app/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(product)
-            })
-            .then(res => res.json())
-            .then(newProduct => {
-                setProducts(prev => [...prev, newProduct]);
-            });
-
-            setId(id + 1);
-
-            // Очистка формы
-            setProductName("");
-            setDescription("");
-            setPrice("");
-            setImage(null);
-            setCategory("");
-            setSellerName("");
-            setContactDetails("");
+            try {
+                const docRef = await addDoc(collection(db, "products"), newProduct);
+                // После добавления можно очистить форму
+                setProductName("");
+                setDescription("");
+                setPrice("");
+                setImage(null);
+                setCategory("");
+                setSellerName("");
+                setContactDetails("");
+                alert("Товар успешно добавлен!");
+            } catch (err) {
+                console.error("Ошибка добавления товара", err);
+            }
         } else {
             alert("Пожалуйста, заполните все поля и выберите изображение");
         }

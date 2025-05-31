@@ -1,7 +1,8 @@
 "use client"
-import React, {useState, useEffect} from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import Navbar from "./Navbar";
+import React, { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase"; 
+import Navbar from "@/app/components/Navbar";
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -9,19 +10,25 @@ const ProductList = () => {
     const [selectedCategory, setSelectedCategory] = useState("All");
 
     useEffect(() => {
-       fetch('https://market-psi-sage.vercel.app/api/products')
-         .then(res => res.json())
-         .then(data => setProducts(data))
-         .catch(err => console.error('Ошибка загрузки продуктов:', err));
-     }, []);
+        // Асинхронная функция для загрузки данных
+        const fetchProducts = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                const fetchedProducts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setProducts(fetchedProducts);
+            } catch (err) {
+                console.error("Ошибка загрузки продуктов:", err);
+            }
+        };
+        fetchProducts();
+    }, []);
 
-    //фильтры по категориям и строке поиска
     const filteredProducts = products.filter((product) => {
         const matchesSearchQuery =
-            product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.description.toLowerCase().includes(searchQuery.toLowerCase());
+        product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesCategory =
-            selectedCategory === "All" || product.category === selectedCategory;
+        selectedCategory === "All" || product.category === selectedCategory;
         return matchesSearchQuery && matchesCategory;
     });
 
