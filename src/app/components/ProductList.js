@@ -9,7 +9,7 @@ const ProductList = () => {
     const [selectedCategory, setSelectedCategory] = useState("All");
 
     useEffect(() => {
-       fetch('https://market-psi-sage.vercel.app//api/products')
+       fetch('https://market-psi-sage.vercel.app/api/products')
          .then(res => res.json())
          .then(data => setProducts(data))
          .catch(err => console.error('Ошибка загрузки продуктов:', err));

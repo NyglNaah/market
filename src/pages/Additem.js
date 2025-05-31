@@ -99,7 +99,7 @@ const ProductForm = () => {
                 contactDetails,
             };
 
-             fetch('https://market-psi-sage.vercel.app//api/products', {
+             fetch('https://market-psi-sage.vercel.app/api/products', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(product)
